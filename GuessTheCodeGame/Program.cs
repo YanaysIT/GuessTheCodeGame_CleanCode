@@ -1,4 +1,7 @@
-﻿using GuessTheCodeGame.Interfaces;
+﻿using GuessTheCodeGame.Application;
+using GuessTheCodeGame.Core.Interfaces;
+using GuessTheCodeGame.Data;
+using GuessTheCodeGame.UI;
 
 namespace GuessTheCodeGame;
 
@@ -7,10 +10,12 @@ public class Program
 
 	public static void Main(string[] args)
 	{
-        IGoalHandler goalHandler = new MooGoalHandler();
-        IUI userInerface = new ConsoleIO();
-        IScoresRepository scoresRepository = new ScoresRepository();
-        var gameController = new GameController(goalHandler, userInerface, scoresRepository);
-		gameController.Run();		
+        IGoalGenerator mooGoalGenerator = new GoalGenerator(4, 9);
+        IGameService mooGameService = new MooGameService(mooGoalGenerator);
+        IScoresRepository scoresRepository = new ScoresRepository("results.txt");
+        IUI ui = new ConsoleIO();
+        var gameController = new GameController(mooGameService, scoresRepository, ui);
+		
+        gameController.Run();		
 	}
 }
