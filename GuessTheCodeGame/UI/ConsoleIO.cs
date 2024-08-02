@@ -2,7 +2,7 @@
 
 namespace GuessTheCodeGame.UI;
 
-internal class ConsoleIO : IUI
+public class ConsoleIO : IUI
 {
     public string GetUserInput()
     {
@@ -42,6 +42,11 @@ internal class ConsoleIO : IUI
         }
     }
 
+    public void DisplayWinningResult(int numberOfGuesses)
+    {
+        DisplayMessage($"Correct, it took {numberOfGuesses} guesses\n");
+    }
+        
     public bool ShouldContinuePlaying()
     {
         DisplayMessage("\nContinue? Yes(any key) / No(n):\n");

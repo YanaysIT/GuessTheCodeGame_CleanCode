@@ -2,7 +2,7 @@
 
 namespace GuessTheCodeGame.Core.Models;
 
-internal class PlayerData : IPlayerData
+public class PlayerData : IPlayerData
 {
     public string PlayerName { get; }
     public int GamesPlayed { get; private set; }
@@ -26,9 +26,14 @@ internal class PlayerData : IPlayerData
         return (double)TotalOfGuesses / GamesPlayed;
     }
 
-    public override bool Equals(object? playerData)
+    public override bool Equals(Object obj)
     {
-        return playerData is PlayerData data && PlayerName.Equals(data.PlayerName);
+        if (obj == null || (obj is not PlayerData))
+        {  
+            return false; 
+        }
+
+        return PlayerName == ((PlayerData) obj).PlayerName;
     }
 
     public override int GetHashCode()

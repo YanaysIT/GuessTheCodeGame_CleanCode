@@ -1,6 +1,6 @@
 ﻿namespace GuessTheCodeGame.Core.Interfaces;
 
-internal interface IGoalGenerator
+public interface IGoalGenerator
 {
     public string GenerateGoal();
 }

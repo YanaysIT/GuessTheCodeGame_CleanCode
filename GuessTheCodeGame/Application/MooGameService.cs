@@ -3,11 +3,11 @@ using GuessTheCodeGame.Core.Models;
 
 namespace GuessTheCodeGame.Application;
 
-internal class MooGameService : IGameService
+public class MooGameService : IGameService<string>
 {
-    private readonly IGoalGenerator _goalGenerator;
+    private readonly IGoalGenerator<string> _goalGenerator;
 
-    public MooGameService(IGoalGenerator goalGenerator) 
+    public MooGameService(IGoalGenerator<string> goalGenerator) 
     {
         _goalGenerator = goalGenerator;
     }
@@ -24,10 +24,10 @@ internal class MooGameService : IGameService
 
         guess = guess.PadRight(goal.Length);
 
-        var index = 0;
+        var i = 0;
         foreach (var g in goal)
         {
-            if (guess[index] == g)
+            if (guess[i] == g)
             {
                 bullsCount++;
             }
@@ -35,7 +35,7 @@ internal class MooGameService : IGameService
             {
                 cowsCount++;
             }
-            index++;
+            i++;
         }
 
         return new BullsAndCows(bullsCount, cowsCount);

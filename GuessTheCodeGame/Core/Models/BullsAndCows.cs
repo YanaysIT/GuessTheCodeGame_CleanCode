@@ -1,9 +1,11 @@
-﻿namespace GuessTheCodeGame.Core.Models;
+﻿using GuessTheCodeGame.Core.Interfaces;
 
-internal class BullsAndCows
+namespace GuessTheCodeGame.Core.Models;
+
+public class BullsAndCows
 {
-    public int BullsCount { get; private set; }
-    public int CowsCount { get; private set; }
+    public int BullsCount { get; }
+    public int CowsCount { get; }
 
     public BullsAndCows(int bullsCount, int cowsCount)
     {

@@ -3,7 +3,7 @@ using GuessTheCodeGame.Core.Models;
 
 namespace GuessTheCodeGame.Data;
 
-internal class ScoresRepository : IScoresRepository
+public class ScoresRepository : IScoresRepository
 {
     private readonly string _scoresFilePath;
     private const string _dataSeparator = "#&#";
@@ -23,7 +23,7 @@ internal class ScoresRepository : IScoresRepository
             var line = scoresFileReader.ReadLine()!;
             var playerData = ParsePlayerDataFromTxtFile(line);
             var existingPlayer = playerScores.FirstOrDefault(p => p.Equals(playerData));
-            
+
             if (existingPlayer is null)
             {
                 playerScores.Add(playerData);

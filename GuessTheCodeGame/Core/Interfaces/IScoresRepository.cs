@@ -1,6 +1,6 @@
 ﻿namespace GuessTheCodeGame.Core.Interfaces;
 
-internal interface IScoresRepository
+public interface IScoresRepository
 {
     public IEnumerable<IPlayerData> GetAllPlayerScores();
     public IEnumerable<IPlayerData> GetLeaderboard();
