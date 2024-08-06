@@ -1,6 +1,6 @@
 ﻿using GuessTheCodeGame.Application;
 using GuessTheCodeGame.Core.Interfaces;
-using GuessTheCodeGame.Core.Models;
+using GuessTheCodeGame.Core.Utilities;
 using GuessTheCodeGame.Data;
 using GuessTheCodeGame.UI;
 
@@ -10,11 +10,13 @@ public class Program
 {
 	public static void Main(string[] args)
 	{
-        IUI ui = new ConsoleIO();
-        IGoalGenerator<string> mooGoalGenerator = new MooGoalGenerator(4, 9);
-        IGameService<string> mooGameService = new MooGameService(mooGoalGenerator);
-        IScoresRepository scoresRepository = new ScoresRepository("results.txt");
-        var gameController = new GameController(mooGameService, scoresRepository, ui);
+        IRandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
+        IGoalGenerator mooGoalGenerator = new MooGoalGenerator(randomNumberGenerator);
+        IGameService mooGameService = new MooGameService(mooGoalGenerator);
+        IUI userInterface = new ConsoleIO();
+        IFileIO streamFileIO = new StreamFileIO();
+        IScoresRepository scoresRepository = new ScoresRepository(scoresFilePath: "results.txt", streamFileIO);
+        var gameController = new GameController(mooGameService, scoresRepository, userInterface);
 		
         gameController.Run();		
 	}

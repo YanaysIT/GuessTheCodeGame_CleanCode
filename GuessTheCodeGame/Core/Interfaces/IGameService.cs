@@ -2,9 +2,8 @@
 
 namespace GuessTheCodeGame.Core.Interfaces;
 
-public interface IGameService<T>
+public interface IGameService
 {
-    public T GenerateGoal();
-    public BullsAndCows CompareGuessAndGoal(T guess, T goal);
-
+    public string GenerateGoal();
+    public BullsAndCows CompareGuessAndGoal(string goal, string gues);
 }

@@ -3,39 +3,36 @@ using GuessTheCodeGame.Core.Models;
 
 namespace GuessTheCodeGame.Application;
 
-public class MooGameService : IGameService<string>
+public class MooGameService : IGameService
 {
-    private readonly IGoalGenerator<string> _goalGenerator;
+    private readonly IGoalGenerator _goalGenerator;
 
-    public MooGameService(IGoalGenerator<string> goalGenerator) 
+    public MooGameService(IGoalGenerator goalGenerator) 
     {
         _goalGenerator = goalGenerator;
     }
 
     public string GenerateGoal()
     {
-        return _goalGenerator.GenerateGoal();
+       return _goalGenerator.GenerateGoal();
     }
 
-    public BullsAndCows CompareGuessAndGoal(string guess, string goal)
+    public BullsAndCows CompareGuessAndGoal(string goal, string guess)
     {
-        var cowsCount = 0;
+        guess = guess.PadRight(goal.Length).Substring(0, goal.Length);
+
         var bullsCount = 0;
-
-        guess = guess.PadRight(goal.Length);
-
-        var i = 0;
-        foreach (var g in goal)
+        var cowsCount = 0;
+        for (int i = 0; i < goal.Length; i++)
         {
-            if (guess[i] == g)
+            if (guess[i] == goal[i])
             {
                 bullsCount++;
             }
-            else if (guess.Contains(g))
+            else if (guess.Contains(goal[i]))
             {
                 cowsCount++;
             }
-            i++;
         }
 
         return new BullsAndCows(bullsCount, cowsCount);

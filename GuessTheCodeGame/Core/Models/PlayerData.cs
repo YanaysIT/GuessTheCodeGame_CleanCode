@@ -23,10 +23,10 @@ public class PlayerData : IPlayerData
 
     public double CalculateAverageGuesses()
     {
-        return (double)TotalOfGuesses / GamesPlayed;
+        return GamesPlayed == 0 ? 0 : (double)TotalOfGuesses / GamesPlayed;
     }
 
-    public override bool Equals(Object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || (obj is not PlayerData))
         {  

@@ -1,37 +1,38 @@
 ﻿using GuessTheCodeGame.Core.Interfaces;
+using GuessTheCodeGame.Core.Models;
 
 namespace GuessTheCodeGame.Application;
 
 public class GameController
 {
-    private readonly IGameService<string> _gameService;
+    private readonly IGameService _gameService;
     private readonly IScoresRepository _scoresRepository;
-    private readonly IUI _ui;
+    private readonly IUI _userInterface;
 
-    public GameController(IGameService<string> gameService, IScoresRepository scoresRepository, IUI ui)
+    public GameController(IGameService gameService, IScoresRepository scoresRepository, IUI userInterface)
     {
         _gameService = gameService;
         _scoresRepository = scoresRepository;
-        _ui = ui;
+        _userInterface = userInterface;
     }
 
     public void Run()
     {
-        var playerName = _ui.GetPlayerName();
+        var playerName = _userInterface.GetPlayerName();
 
         do
         {
-            var numberOfGuesses = PlayRound();
-            _scoresRepository.SavePlayerScore(playerName, numberOfGuesses);
-            _ui.DisplayLeaderBoard(_scoresRepository.GetLeaderboard());
+            var numberOfGuesses = PlayRound(); 
+            _scoresRepository.SavePlayerScore(new PlayerData(playerName, numberOfGuesses));
+            _userInterface.DisplayLeaderBoard(_scoresRepository.GetLeaderboard());
         }
-        while (_ui.ShouldContinuePlaying());
+        while (_userInterface.ShouldContinuePlaying());
     }
 
     private int PlayRound()
     {
         var goal = _gameService.GenerateGoal();
-        _ui.DisplayGameStartMessage(goal.ToString());
+        _userInterface.DisplayGameStartMessage(goal);
         var numberOfGuesses = GuessUntilGoalIsReached(goal);
 
         return numberOfGuesses;
@@ -39,18 +40,18 @@ public class GameController
 
     private int GuessUntilGoalIsReached(string goal)
     {
-        string guess = string.Empty;
         var numberOfGuesses = 0;
+        var guess = string.Empty;
 
-        while (!guess.Equals(goal))
+        do
         {
-            guess = _ui.GetUserInput();
-            var result = _gameService.CompareGuessAndGoal(guess, goal);
-            _ui.DisplayMessage($"{result}\n");
+            guess = _userInterface.GetUserInput();
+            var result = _gameService.CompareGuessAndGoal(goal, guess);
+            _userInterface.DisplayMessage($"{result}\n");
             numberOfGuesses++;
-        }
+        } while (goal != guess);
 
-        _ui.DisplayWinningResult(numberOfGuesses);
+        _userInterface.DisplayWinningResult(numberOfGuesses);
 
         return numberOfGuesses;
     }

@@ -1,124 +1,105 @@
 ﻿using GuessTheCodeGame.Core.Interfaces;
-using GuessTheCodeGame.Core.Models;
-using Moq;
+using GuessTheCodeGameTests.Mock;
 
 namespace GuessTheCodeGame.Application.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class MooGameServiceTests
     {
-        private Mock<IGoalGenerator<string>> _mockGoalGenerator;
-        private MooGameService _mooGameService;
+        private IGoalGenerator _goalGenerator;
+        private MooGameService _gameService;
+        private string _expectedGoal = "1234";
 
         [TestInitialize]
         public void Initialize()
         {
-            _mockGoalGenerator = new Mock<IGoalGenerator<string>>();
-            _mooGameService = new MooGameService(_mockGoalGenerator.Object);
-        }
-
-        [TestMethod()]
-        [DataRow()]
-        public void CompareGuessAndGoal_ShouldHandleExactMatch()
-        {
-            //Arrange
-            var goal = "5432";
-            var guess = "5432";
-            var expectedBullsAndCows = new BullsAndCows(4, 0);
-
-            //Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
-
-            //Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and Cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
-        }
-
-        [TestMethod()]
-        public void CompareGuessAndGoal_ShouldHandlePartialMatch()
-        {
-            //Arrange
-            var goal = "1234";
-            var guess = "1431";
-            var expectedBullsAndCows = new BullsAndCows(2, 1);
-
-            //Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
-
-            //Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
-
-        }
-
-        [TestMethod()]
-        public void CompareGuessAndGoal_ShouldHandleNoMatch()
-        {
-            //Arrange
-            var goal = "1234";
-            var guess = "5678";
-            var expectedBullsAndCows = new BullsAndCows(0, 0);
-
-            //Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
-
-            //Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
+            _goalGenerator = new MockMooGoalGenerator(_expectedGoal);
+            _gameService = new MooGameService(_goalGenerator);
         }
 
         [TestMethod]
-        public void CompareGuessAndGoal_ShouldHandleLongerGuess()
+        public void GenerateGoal_ShouldReturnExpectedGoal()
         {
-            // Arrange
-            var goal = "1234";
-            var guess = "123456";
-            var expectedBullsAndCows = new BullsAndCows(4, 0);
-
             // Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
+            string actualGoal = _gameService.GenerateGoal();
 
             // Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
+            Assert.AreEqual(_expectedGoal, actualGoal, $"Expected goal was {_expectedGoal}, but it's {actualGoal}.");
         }
 
-        [TestMethod]
-        public void CompareGuessAndGoal_ShouldHandleShorterGuess()
+        private void AssertBullsAndCows(string guess, int expectedBullsCount, int expectedCowsCount)
         {
-            // Arrange
-            var goal = "1234";
-            var guess = "02";
-            var expectedBullsAndCows = new BullsAndCows(1, 0);
-
             // Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
+            var comparisonResult = _gameService.CompareGuessAndGoal(_expectedGoal, guess);
+            var actualBullsCount = comparisonResult.BullsCount;
+            var actualCowsCount = comparisonResult.CowsCount;
 
             // Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
+            Assert.IsTrue(expectedBullsCount == actualBullsCount && expectedCowsCount == actualCowsCount,
+               $"Expected number of Bulls and Cows: [{expectedBullsCount}, {expectedCowsCount}], but it's [{actualBullsCount}, {actualCowsCount}].");
         }
 
         [TestMethod]
-        public void CompareGuessAndGoal_ShouldHandleEmptyGuess()
+        [DataRow("1234", 4, 0)]
+        [DataRow ("12345678", 4, 0)]
+        public void CompareGuessAndGoal_ShouldHandleExactMatch(string guess, int expectedBullsCount, int expectedCowsCount)
         {
-            // Arrange
-            var goal = "1234";
-            var guess = "";
-            var expectedBullsAndCows = new BullsAndCows(0, 0);
 
-            // Act
-            var actualBullsAndCows = _mooGameService.CompareGuessAndGoal(guess, goal);
-
-            //Assert
-            Assert.IsTrue(expectedBullsAndCows.BullsCount == actualBullsAndCows.BullsCount && expectedBullsAndCows.CowsCount == actualBullsAndCows.CowsCount,
-                $"The expected number of Bulls and cows was {expectedBullsAndCows.BullsCount} and {expectedBullsAndCows.CowsCount} respectively, but it's " +
-                $"{actualBullsAndCows.BullsCount} and {actualBullsAndCows.CowsCount}.");
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
         }
+
+        [TestMethod]
+        [DataRow("1243", 2, 2)]
+        [DataRow("3567", 0, 1)]
+        [DataRow("1567243", 1, 0)]
+        public void CompareGuessAndGoal_ShouldHandlePartialMatch(string guess, int expectedBullsCount, int expectedCowsCount)
+        {
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
+        }
+
+        [TestMethod]
+        [DataRow("5678", 0, 0)]
+        public void CompareGuessAndGoal_ShouldHandleNoMatch(string guess, int expectedBullsCount, int expectedCowsCount)
+        {
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
+        }
+
+        [TestMethod]
+        [DataRow( "", 0, 0)]
+        public void CompareGuessAndGoal_ShouldHandleEmptyGuess(string guess, int expectedBullsCount, int expectedCowsCount)
+        {
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
+        }
+
+        [TestMethod]
+        [DataRow("12345678", 4, 0)]
+        [DataRow("1299345678", 2, 0)]
+        public void CompareGuessAndGoal_ShouldHandleLongerGuess(string guess, int expectedBullsCount, int expectedCowsCount)
+        {
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
+        }
+
+        [TestMethod]
+        [DataRow("1212", 2, 0)]
+        [DataRow("2121", 0, 2)]
+        public void CompareGuessAndGoal_ShouldHandleRepeatedCharactersInGuess(string guess, int expectedBullsCount, int expectedCowsCount)
+        {
+            AssertBullsAndCows(guess, expectedBullsCount, expectedCowsCount);
+        }
+
+        //[TestMethod]
+        //[DataRow( "1234", true)]
+        //[DataRow( "1234567", true)]
+        //[DataRow( "4321", false)]
+        //[DataRow( "", false)]
+        //public void IsCorrectGuess_ShouldReturnExpectedResult(string guess, bool expectedResult)
+        //{
+        //    // Act
+        //    var actualResult = _gameService.IsCorrectGuess(_goal, guess);
+
+        //    // Assert
+        //    Assert.AreEqual(expectedResult, actualResult, 
+        //        $"Expected result of the comparison between goal: {_goal} and guess: {guess} was {expectedResult} but is {actualResult}.");
+        //}
     }
 }

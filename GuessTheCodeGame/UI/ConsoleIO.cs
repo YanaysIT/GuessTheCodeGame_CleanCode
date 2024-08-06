@@ -57,10 +57,11 @@ public class ConsoleIO : IUI
 
     public void DisplayLeaderBoard(IEnumerable<IPlayerData> leaderBoard)
     {
-        DisplayMessage($"{"Player",-9}{"games",5}{"average",9}");
+        var playerDataFormat = "{0,-9}{1,5}{2,9:F2}";
+        DisplayMessage(String.Format(playerDataFormat,"Player", "Games", "Average"));
         foreach (var player in leaderBoard)
         {
-            DisplayMessage($"{player.PlayerName,-9}{player.GamesPlayed,5}{player.CalculateAverageGuesses(),9:F2}");
+            DisplayMessage(String.Format(playerDataFormat, player.PlayerName, player.GamesPlayed, player.CalculateAverageGuesses()));
         }
     }
 }

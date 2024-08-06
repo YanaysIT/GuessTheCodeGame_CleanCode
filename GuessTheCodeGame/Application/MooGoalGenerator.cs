@@ -4,29 +4,22 @@ namespace GuessTheCodeGame.Application;
 
 public class MooGoalGenerator : IGoalGenerator
 {
-    private readonly int _goalLength;
-    private readonly int _maxDigitValue;
-    private readonly Random _randomGenerator;
+    private readonly int _goalLength = 4;
+    private readonly int _maxDigitValue = 9;
+    private readonly IRandomNumberGenerator _randomNumberGenerator;
 
-    public MooGoalGenerator(int goalLength, int maxDigitValue)
+    public MooGoalGenerator(IRandomNumberGenerator randomNumberGenerator)
     {
-        if (goalLength > maxDigitValue + 1)
-        {
-            throw new ArgumentException($"Goal length {goalLength} cannot be greater than maximum digit value {maxDigitValue}.");
-        }
-
-        _goalLength = goalLength;
-        _maxDigitValue = maxDigitValue;
-        _randomGenerator = new Random();
+        _randomNumberGenerator = randomNumberGenerator;
     }
 
     public string GenerateGoal()
     { 
-        string goal = string.Empty;
+        var goal = string.Empty;
 
         while (goal.Length < _goalLength)
         {
-            var randomDigit = _randomGenerator.Next(_maxDigitValue + 1).ToString();
+            var randomDigit = _randomNumberGenerator.Next(_maxDigitValue + 1).ToString();
             if (!goal.Contains(randomDigit))
             {
                 goal += randomDigit;

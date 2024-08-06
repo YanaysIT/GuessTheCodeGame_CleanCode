@@ -4,11 +4,14 @@
     public class BullsAndCowsTests
     {
         [TestMethod]
-        public void ToString_ShouldReturnCorrectFormat()
+        [DataRow(0, 4,",CCCC")]
+        [DataRow(4, 0, "BBBB,")]
+        [DataRow(1, 3, "B,CCC")]
+        [DataRow(0, 0, ",")]
+        public void ToString_ShouldReturnCorrectFormat(int bullsCount, int cowsCount, string expectedString)
         {
             // Arrange
-            var bullsAndCows = new BullsAndCows(1, 3);
-            string expectedString = "B,CCC";
+            var bullsAndCows = new BullsAndCows(bullsCount, cowsCount);
 
             // Act
             var actualString = bullsAndCows.ToString();

@@ -6,25 +6,32 @@ namespace GuessTheCodeGame.Data;
 public class ScoresRepository : IScoresRepository
 {
     private readonly string _scoresFilePath;
+    private readonly IFileIO _fileManager;
     private const string _dataSeparator = "#&#";
 
-    public ScoresRepository(string scoresFilePath)
+    public ScoresRepository(string scoresFilePath, IFileIO fileManager)
     {
         _scoresFilePath = scoresFilePath;
+        _fileManager = fileManager;
     }
 
     public IEnumerable<IPlayerData> GetAllPlayerScores()
     {
         var playerScores = new List<IPlayerData>();
-        using var scoresFileReader = new StreamReader(_scoresFilePath);
-
-        while (!scoresFileReader.EndOfStream)
+        var fileLines = _fileManager.ReadLines(_scoresFilePath);
+       
+        foreach (var line in fileLines)
         {
-            var line = scoresFileReader.ReadLine()!;
             var playerData = ParsePlayerDataFromTxtFile(line);
+
+            if (playerData is NullPlayerData)
+            {
+                continue;
+            }
+
             var existingPlayer = playerScores.FirstOrDefault(p => p.Equals(playerData));
 
-            if (existingPlayer is null)
+            if (existingPlayer == null)
             {
                 playerScores.Add(playerData);
             }
@@ -37,13 +44,20 @@ public class ScoresRepository : IScoresRepository
         return playerScores;
     }
 
-    private PlayerData ParsePlayerDataFromTxtFile(string line)
+    private IPlayerData ParsePlayerDataFromTxtFile(string line)
     {
-        var playerNameAndGuesses = line.Split(new string[] { _dataSeparator }, StringSplitOptions.None);
-        var playerName = playerNameAndGuesses[0];
-        var numberOfGuesses = Convert.ToInt32(playerNameAndGuesses[1]);
+        try
+        {
+            var playerNameAndGuesses = line.Split(_dataSeparator);
+            var playerName = playerNameAndGuesses[0];
+            var numberOfGuesses = Convert.ToInt32(playerNameAndGuesses[1]);
 
-        return new PlayerData(playerName, numberOfGuesses);
+            return new PlayerData(playerName, numberOfGuesses);
+        }
+        catch
+        {
+            return new NullPlayerData();
+        }
     }
 
     public IEnumerable<IPlayerData> GetLeaderboard()
@@ -53,9 +67,8 @@ public class ScoresRepository : IScoresRepository
         return playerScores.OrderBy(p => p.CalculateAverageGuesses());
     }
 
-    public void SavePlayerScore(string playerName, int numberOfGuesses)
+    public void SavePlayerScore(IPlayerData playerData)
     {
-        using var scoresFileWriter = new StreamWriter(_scoresFilePath, append: true);
-        scoresFileWriter.WriteLine($"{playerName} {_dataSeparator} {numberOfGuesses}");
+        _fileManager.WriteLine(_scoresFilePath,$"{playerData.PlayerName}{_dataSeparator}{playerData.TotalOfGuesses}");
     }
 }
