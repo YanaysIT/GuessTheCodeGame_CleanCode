@@ -1,58 +1,89 @@
-﻿using GuessTheCodeGame.Core.Interfaces;
-using GuessTheCodeGame.Core.Models;
+﻿namespace GuessTheCodeGame.Application;
 
-namespace GuessTheCodeGame.Application;
-
-public class GameController
+public class GameController : IGameController
 {
-    private readonly IGameService _gameService;
-    private readonly IScoresRepository _scoresRepository;
-    private readonly IUI _userInterface;
-
-    public GameController(IGameService gameService, IScoresRepository scoresRepository, IUI userInterface)
+    private readonly IPlayerScoresRepository _scoresRepository;
+    private readonly IUI _ui;
+    private IGameLogic _gameLogic;
+    private string _playerName;
+    
+    public GameController(IPlayerScoresRepository scoresRepository, IUI userInterface)
     {
-        _gameService = gameService;
         _scoresRepository = scoresRepository;
-        _userInterface = userInterface;
+        _ui = userInterface;
+        _playerName = GetPlayerName();
     }
 
-    public void Run()
+    public GameController(IPlayerScoresRepository scoresRepository, IUI userInterface, IGameLogic gameLogic) : this (scoresRepository, userInterface)
     {
-        var playerName = _userInterface.GetPlayerName();
+        _gameLogic = gameLogic;
+    }
 
+    public void SetGameLogic(IGameLogic gameLogic)
+    {
+        _gameLogic = gameLogic ?? throw new ArgumentNullException(nameof(gameLogic));
+    }
+
+    private string GetPlayerName()
+    {
+        string playerName;
         do
         {
-            var numberOfGuesses = PlayRound(); 
-            _scoresRepository.SavePlayerScore(new PlayerData(playerName, numberOfGuesses));
-            _userInterface.DisplayLeaderBoard(_scoresRepository.GetLeaderboard());
+            playerName = _ui.GetPlayerName();
+
+            if (string.IsNullOrWhiteSpace(playerName))
+            {
+                _ui.ShowMessage("Player name cannot be empty. Please, try again.");
+            }
+        } while (string.IsNullOrWhiteSpace(playerName));
+
+        return playerName;
+    }
+
+    public void Play()
+    {
+        do
+        {
+            _ui.ShowMessage($"Playing {_gameLogic.GameName}...");
+            GenerateRoundGoal();
+            int numberOfGuesses = GuessLoop();
+            _ui.ShowRoundOutcome(numberOfGuesses);
+            SavePlayerScore(numberOfGuesses);
+            ShowLeaderboard();
         }
-        while (_userInterface.ShouldContinuePlaying());
+        while (_ui.ShouldContinuePlaying());
     }
 
-    private int PlayRound()
+    private void GenerateRoundGoal()
     {
-        var goal = _gameService.GenerateGoal();
-        _userInterface.DisplayGameStartMessage(goal);
-        var numberOfGuesses = GuessUntilGoalIsReached(goal);
-
-        return numberOfGuesses;
+        string goal = _gameLogic.GenerateGoal();
+        _ui.ShowGameStartMessage(goal);
     }
 
-    private int GuessUntilGoalIsReached(string goal)
+    private int GuessLoop()
     {
-        var numberOfGuesses = 0;
-        var guess = string.Empty;
-
+        int numberOfGuesses = 0;
         do
         {
-            guess = _userInterface.GetUserInput();
-            var result = _gameService.CompareGuessAndGoal(goal, guess);
-            _userInterface.DisplayMessage($"{result}\n");
-            numberOfGuesses++;
-        } while (goal != guess);
+            string guess = _ui.GetUserInput()!;
+            string guessFeedback = _gameLogic.CompareGuessAndGoal(guess);
+            _ui.ShowMessage($"{guessFeedback}\n");
+            numberOfGuesses ++;
 
-        _userInterface.DisplayWinningResult(numberOfGuesses);
+        } while (!_gameLogic.IsCorrectGuess);
 
         return numberOfGuesses;
+    }
+
+    private void SavePlayerScore(int numberOfGuesses)
+    {
+        IPlayer player = new Player(_playerName, numberOfGuesses);
+        _scoresRepository.SavePlayerScore(player, _gameLogic.GameName);
+    }
+
+    private void ShowLeaderboard()
+    {
+        IEnumerable<IPlayer> leaderboard = _scoresRepository.GetLeaderboard(_gameLogic.GameName);
+        _ui.ShowLeaderBoard(leaderboard);
     }
 }

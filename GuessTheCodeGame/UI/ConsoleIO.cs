@@ -1,67 +1,60 @@
-﻿using GuessTheCodeGame.Core.Interfaces;
+﻿using GuessTheCodeGame.Core.Utilities;
 
 namespace GuessTheCodeGame.UI;
 
 public class ConsoleIO : IUI
 {
-    public string GetUserInput()
+    public string? GetUserInput()
     {
-        return Console.ReadLine()?.Trim() ?? "";
+        return Console.ReadLine();
     }
 
-    public void DisplayMessage(string message)
+    public void ShowMessage(string message)
     {
         Console.WriteLine(message);
     }
 
-    public string GetPlayerName()
+    public string? GetPlayerName()
     {
-        string playerName;
-        DisplayMessage("Enter your user name:\n");
+        Console.WriteLine("Enter your user name:\n");
 
-        do
-        {
-            playerName = GetUserInput();
-
-            if (playerName.Equals(string.Empty))
-            {
-                DisplayMessage("The player name cannot be empty. Please, enter a name: ");
-            }
-        } while (playerName.Equals(string.Empty));
-
-        return playerName;
+        return Console.ReadLine();
     }
 
-    public void DisplayGameStartMessage(string goal, bool isPracticeMode = true)
+    public void ShowGameStartMessage(string goal)
     {
-        DisplayMessage("\nNew game:\n");
+        Console.WriteLine("\nNew game:");
 
-        if (isPracticeMode)
-        {
-            DisplayMessage($"For practice, number is: {goal}\n");
-        }
+        //comment out or remove next line to play real games!
+        Console.WriteLine($"For practice, number is: {goal}\n");
     }
 
-    public void DisplayWinningResult(int numberOfGuesses)
+    public void ShowRoundOutcome(int numberOfGuesses)
     {
-        DisplayMessage($"Correct, it took {numberOfGuesses} guesses\n");
+        Console.WriteLine($"Correct, it took {numberOfGuesses} guesses\n");
     }
         
     public bool ShouldContinuePlaying()
     {
-        DisplayMessage("\nContinue? Yes(any key) / No(n):\n");
-        string userInput = GetUserInput().ToLower();
+        Console.WriteLine($"Continue? (y/n) \n");
+        string? wantsToContinue = Console.ReadLine()?.ToLower();
 
-        return userInput != "n";
+        return wantsToContinue?.FirstOrDefault() != 'n' ;
     }
 
-    public void DisplayLeaderBoard(IEnumerable<IPlayerData> leaderBoard)
+    public void ShowLeaderBoard(IEnumerable<IPlayer> leaderBoard)
     {
-        var playerDataFormat = "{0,-9}{1,5}{2,9:F2}";
-        DisplayMessage(String.Format(playerDataFormat,"Player", "Games", "Average"));
-        foreach (var player in leaderBoard)
-        {
-            DisplayMessage(String.Format(playerDataFormat, player.PlayerName, player.GamesPlayed, player.CalculateAverageGuesses()));
-        }
+        string formattedLeaderboard = leaderBoard.GetFormattedLeaderboard();
+        Console.WriteLine(formattedLeaderboard);
+    }
+
+    public void Clear()
+    { 
+        Console.Clear();    
+    }
+
+    public void Exit()
+    {
+        Environment.Exit(0);
     }
 }

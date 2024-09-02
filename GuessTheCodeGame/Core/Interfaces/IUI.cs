@@ -2,11 +2,13 @@
 
 public interface IUI
 {
-    public string GetUserInput();
-    public void DisplayMessage(string message);
+    public string? GetUserInput();
+    public void ShowMessage(string message);
     public string GetPlayerName();
-    public void DisplayGameStartMessage(string goal, bool isPracticeMode = true);
-    public void DisplayWinningResult(int numberOfGuesses);
+    public void ShowGameStartMessage(string goal);
+    public void ShowRoundOutcome(int numberOfGuesses);
     public bool ShouldContinuePlaying();
-    public void DisplayLeaderBoard(IEnumerable<IPlayerData> leaderBoard);
+    public void ShowLeaderBoard(IEnumerable<IPlayer> leaderBoard);
+    public void Clear();
+    public void Exit();
 }
