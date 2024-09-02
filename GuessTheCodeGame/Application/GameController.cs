@@ -44,6 +44,7 @@ public class GameController : IGameController
     {
         do
         {
+            _ui.Clear();
             _ui.ShowMessage($"Playing {_gameLogic.GameName}...");
             GenerateRoundGoal();
             int numberOfGuesses = GuessLoop();

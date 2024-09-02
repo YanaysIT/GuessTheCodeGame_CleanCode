@@ -54,6 +54,7 @@ public class GameMenuService : IGameMenuService
 
         return isValidGameType ? (GameTypes)gameValue : GameTypes.None;
     }
+
     private void LaunchGame(GameTypes selectedGameType)
     {
         if (selectedGameType != GameTypes.None)

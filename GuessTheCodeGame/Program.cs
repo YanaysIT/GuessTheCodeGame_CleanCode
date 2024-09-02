@@ -12,8 +12,10 @@ public class Program
         IUI userInterface = new ConsoleIO();
         IPlayerScoresRepository scoresRepository = new PlayerScoresRepository("results.txt",new FileStreamIO());
         IGameController gameController = new GameController(scoresRepository, userInterface);
+        IGameMenuService gameMenu = new GameMenuService(userInterface, gameController);
+        gameMenu.SelectGame();
 
-        //The controller can also be used without menu, and the strategy can setted via constuctor injection or SetGameLogic method
+        //The controller can also be used without menu, and the strategy setted via constuctor injection or SetGameLogic method
         //IGameLogic moo = GameFactory.CreateGame(GameTypes.Moo);
         //gameController.SetGameLogic(moo);
         //gameController.Play();
