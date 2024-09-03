@@ -13,7 +13,7 @@ public class Program
         IPlayerScoresRepository scoresRepository = new PlayerScoresRepository("results.txt",new FileStreamIO());
         IGameController gameController = new GameController(scoresRepository, userInterface);
         IGameMenuService gameMenu = new GameMenuService(userInterface, gameController);
-        gameMenu.SelectGame();
+        gameMenu.Run();
 
         //The controller can also be used without menu, and the strategy setted via constuctor injection or SetGameLogic method
         //IGameLogic moo = GameFactory.CreateGame(GameTypes.Moo);

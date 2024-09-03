@@ -2,5 +2,5 @@
 
 public interface IGameMenuService
 {
-    public void SelectGame();
+    public void Run();
 }

@@ -11,7 +11,7 @@ public class GameMenuService : IGameMenuService
         _gameController = gameController;
     }
 
-    public void SelectGame()
+    public void Run()
     {
         while (true)
         {
