@@ -2,7 +2,7 @@
 {
     public class WordleLogic : IGameLogic
     {
-        public GameTypes GameName => GameTypes.Worlde;
+        public GameTypes GameName => GameTypes.Wordle;
         public bool IsCorrectGuess => _guessFeedback == _goal;
         
         private const int GoalLength = 5;

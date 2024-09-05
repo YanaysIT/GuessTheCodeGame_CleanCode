@@ -4,6 +4,6 @@ public enum GameTypes
 {
     Moo = 1,
     MasterMind,
-    Worlde,
+    Wordle,
     None
 }

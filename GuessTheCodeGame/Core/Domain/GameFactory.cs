@@ -8,7 +8,7 @@ public class GameFactory
         {
             GameTypes.Moo => new MooGameLogic(new RandomNumberGenerator(), new GuessComparer()),
             GameTypes.MasterMind => new MasterMindLogic(new RandomNumberGenerator(), new GuessComparer()),
-            GameTypes.Worlde => new WordleLogic(new RandomNumberGenerator()),
+            GameTypes.Wordle => new WordleLogic(new RandomNumberGenerator()),
             _ => throw new ArgumentException($"Unsupported game type: {gameType}"),
         };
     }
