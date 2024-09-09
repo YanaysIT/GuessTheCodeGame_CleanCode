@@ -14,10 +14,5 @@ public class Program
         IGameController gameController = new GameController(scoresRepository, userInterface);
         IGameMenuService gameMenu = new GameMenuService(userInterface, gameController);
         gameMenu.Run();
-
-        //The controller can also be used without menu, and the strategy setted via constuctor injection or SetGameLogic method
-        //IGameLogic moo = GameFactory.CreateGame(GameTypes.Moo);
-        //gameController.SetGameLogic(moo);
-        //gameController.Play();
     }
 }
